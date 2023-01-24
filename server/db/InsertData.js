@@ -20,28 +20,49 @@ const client = new Client({
 };
 
 const question =
-  `\copy question from '/Users/andyma/Desktop/SDC_CSV/questions.csv' DELIMITER ',' CSV HEADER`
+"\copy question from '/Users/andyma/Desktop/SDC_CSV/questions.csv' DELIMITER ',' CSV HEADER"
 const answers =
-  `\copy answer from '/Users/andyma/Desktop/SDC_CSV/answers.csv' DELIMITER ',' CSV HEADER`
+`\copy answer from '/Users/andyma/Desktop/SDC_CSV/answers.csv' DELIMITER ',' CSV HEADER`
 const photo =
-  `\copy photo from '/Users/andyma/Desktop/SDC_CSV/answers_photos.csv' DELIMITER ',' CSV HEADER`
+`\copy photo from '/Users/andyma/Desktop/SDC_CSV/answers_photos.csv' DELIMITER ',' CSV HEADER`
+const update_question_serial = "SELECT setval('question_id_seq', (SELECT MAX(id) from question))";
+const update_answer_serial = "SELECT setval('answer_id_seq', (SELECT MAX(id) from answer))";
+const update_photo_serial = "SELECT setval('photo_id_seq', (SELECT MAX(id) from photo))";
 
 execute(question)
   .then ((result) => {
     if(result) {
-      console.log(`question table created`);
+      console.log(`question data inserted`);
     }
     return execute(answers);
   })
   .then((result) => {
     if(result) {
-      console.log(`answers table created`);
+      console.log(`answer data inserted`);
     }
     return execute(photo);
   })
   .then((result) => {
     if(result) {
-      console.log(`photo table created`);
+      console.log(`photo data inserted`);
+    }
+    return execute(update_question_serial)
+  })
+  .then((result) => {
+    if(result) {
+      console.log(`changed max index on photos`);
+    }
+   return execute(update_answer_serial);
+  })
+  .then((result) => {
+    if(result) {
+      console.log(`changed max index on answer `);
+    }
+   return execute(update_photo_serial);
+  })
+  .then((result) => {
+    if(result) {
+     console.log(`changed max index on photos`);
     }
     client.end;
   })

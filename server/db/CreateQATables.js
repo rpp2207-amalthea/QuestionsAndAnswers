@@ -21,7 +21,7 @@ const client = new Client({
 
 const question =
   `CREATE TABLE IF NOT EXISTS question (
-    id INT,
+    id SERIAL,
     product_id INT,
     body VARCHAR(250),
     date_written BIGINT,
@@ -32,9 +32,9 @@ const question =
     PRIMARY KEY(id)
   )`
 
-const answers =
+const answer =
     `CREATE TABLE IF NOT EXISTS answer (
-      id INT,
+      id SERIAL,
       question_id INT,
       body VARCHAR(250),
       date_written BIGINT,
@@ -47,19 +47,24 @@ const answers =
     )`
 const photo =
       `CREATE TABLE IF NOT EXISTS photo (
-        id INT,
+        id SERIAL,
         answer_id INT,
         url TEXT,
         FOREIGN KEY (answer_id) REFERENCES answer(id)
       )`
 
+const index_question_product_id = 'CREATE INDEX question_product_id_idx ON question(product_id)';
+const index_question_id = 'CREATE INDEX question_id_idx ON question(id)';
+const answer_question_id = 'CREATE INDEX answer_question_id_idx ON answer(question_id)';
+const photo_answer_id = 'CREATE INDEX photo_answer_id_idx ON photo(answer_id)';
+
+
 execute(question)
   .then ((result) => {
     if(result) {
       console.log(`question table created`);
-
     }
-    return execute(answers);
+    return execute(answer);
   })
   .then((result) => {
     if(result) {
@@ -71,8 +76,27 @@ execute(question)
      if(result) {
       console.log(`photo table created`);
      }
-     client.end;
+     return execute(index_question_product_id)
    })
+
+  .then((result) => {
+    if(result) {
+     console.log(`created index for product table `);
+    }
+    return execute(answer_question_id)
+  })
+  .then((result) => {
+    if(result) {
+     console.log(`created index for answer_question_id`);
+    }
+    return execute(photo_answer_id)
+  })
+  .then((result) => {
+    if(result) {
+     console.log(`created index for photo_answer id`);
+    }
+    client.end;
+  })
   .catch((err) => {
     console.log(`err is increating tables : ${err.stack}`);
   })
