@@ -11,7 +11,8 @@ const client = new Client({
 
   const execute = async (query) => {
     try {
-        await client.query(query);  // sends queries
+        await client.query(query);
+        console.log(`done!`) // sends queries
         return true;
     } catch (error) {
         console.error(error.stack);
@@ -58,45 +59,47 @@ const index_question_id = 'CREATE INDEX question_id_idx ON question(id)';
 const answer_question_id = 'CREATE INDEX answer_question_id_idx ON answer(question_id)';
 const photo_answer_id = 'CREATE INDEX photo_answer_id_idx ON photo(answer_id)';
 
+const allQueries = [question, answer, photo, index_question_product_id, index_question_id, answer_question_id, photo_answer_id];
 
-execute(question)
-  .then ((result) => {
-    if(result) {
-      console.log(`question table created`);
-    }
-    return execute(answer);
-  })
-  .then((result) => {
-    if(result) {
-      console.log(`answers table created`);
-    }
-   return execute(photo);
-   })
-  .then((result) => {
-     if(result) {
-      console.log(`photo table created`);
-     }
-     return execute(index_question_product_id)
-   })
+allQueries.reduce((p, fn) => p.then(execute(fn)), Promise.resolve());
+// execute(question)
+//   .then ((result) => {
+//     if(result) {
+//       console.log(`question table created`);
+//     }
+//     return execute(answer);
+//   })
+//   .then((result) => {
+//     if(result) {
+//       console.log(`answers table created`);
+//     }
+//    return execute(photo);
+//    })
+//   .then((result) => {
+//      if(result) {
+//       console.log(`photo table created`);
+//      }
+//      return execute(index_question_product_id)
+//    })
 
-  .then((result) => {
-    if(result) {
-     console.log(`created index for product table `);
-    }
-    return execute(answer_question_id)
-  })
-  .then((result) => {
-    if(result) {
-     console.log(`created index for answer_question_id`);
-    }
-    return execute(photo_answer_id)
-  })
-  .then((result) => {
-    if(result) {
-     console.log(`created index for photo_answer id`);
-    }
-    client.end;
-  })
-  .catch((err) => {
-    console.log(`err is increating tables : ${err.stack}`);
-  })
+//   .then((result) => {
+//     if(result) {
+//      console.log(`created index for product table `);
+//     }
+//     return execute(answer_question_id)
+//   })
+//   .then((result) => {
+//     if(result) {
+//      console.log(`created index for answer_question_id`);
+//     }
+//     return execute(photo_answer_id)
+//   })
+//   .then((result) => {
+//     if(result) {
+//      console.log(`created index for photo_answer id`);
+//     }
+//     client.end;
+//   })
+//   .catch((err) => {
+//     console.log(`err is increating tables : ${err.stack}`);
+//   })
